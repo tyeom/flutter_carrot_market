@@ -4,6 +4,7 @@
  *            npm install moment
  *            npm install decode-html
  *            npm install firebase-admin
+ *            npm install multer
  *
  */
 

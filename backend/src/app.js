@@ -1,4 +1,5 @@
 const moment = require('moment');
+const multer = require("multer");
 const bodyParser = require('body-parser');
 
 const admin = require('firebase-admin');
@@ -8,7 +9,32 @@ const firebaseAdmin = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://carrotmarketclone-c6231-default-rtdb.firebaseio.com"
 });
-  
+
+const multerStorage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './imageUpload');
+    },
+    filename: function(req, file, cb) {
+        cb(null, `articles_${Date.now()}.${file.mimetype.split("/")[1]}`);
+    }
+});
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith("image")) {
+      cb(null, true);
+    }
+    else {
+      cb("Please upload only articlesImages.", false);
+    }
+};
+const upload = multer({
+    storage: multerStorage,
+    // 업로드 사이즈 제한 : 5MB
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: multerFilter
+});
+// Limit 5 image uploads
+const uploadFiles = upload.array("articlesImages", 5);
+
 module.exports = function(app) {
     app.use(bodyParser.json());
 
@@ -16,6 +42,33 @@ module.exports = function(app) {
     app.get('/',function(req,res) {
         res.statusCode = 200;
         res.send("Main");
+    });
+
+    // 이미지 업로드
+    app.post('/articlesImageUpload', function(req, res){
+        uploadFiles(req, res, err => {
+            if(err instanceof multer.MulterError) {
+                if(err.code == "LIMIT_UNEXPECTED_FILE") {
+                    res.status(401)
+                    .json({error: 'Limit unexpected file'});
+                }
+                else {
+                    res.status(401)
+                    .json({error: err.toString()});
+                }
+            }
+            else if (err) {
+                res.status(500)
+                .json({error: err.toString()});
+            }
+            else {
+                console.log(req.files);
+                console.log('이미지 업로드 완료');
+
+                res.status(200)
+                .json({images: req.files.map((item) => item.filename)});
+            }
+        })
     });
 
     // 사용자 추가
@@ -118,7 +171,8 @@ module.exports = function(app) {
             snapshot.forEach((childSnapshot) => {
                 // itemFavorites의 itemId 추출
                 const itemIds = childSnapshot.val()['itemId'];
-                itemIds.forEach((item) => itemFavoritesRows.push(item));
+                if(itemIds != null)
+                    itemIds.forEach((item) => itemFavoritesRows.push(item));
             });
         })
         .then(() => {
