@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:app/models/profile.dart';
 
 class AccountService {
-  final String _baseURL = 'arong.info:7004';
+  static const String _baseURL = 'arong.info:7004';
+  //final String _baseURL = '127.0.0.1:7004';
 
   // 프로필 정보 요청
   Future<Profile> fetchProfile(http.Client client, String phoneNum) async {

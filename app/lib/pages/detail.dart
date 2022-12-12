@@ -41,7 +41,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     }
 
     // 판매 데이터 상세 조회
-    _serviceProvider.fetchDetailArticle(widget.articles.id);
+    _serviceProvider.fetchDetailArticle(widget.articles.id!);
 
     // 해당 판매자 게시글 조회
     _serviceProvider.fetchArticlesByProfile(widget.articles.profile);
@@ -103,7 +103,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
       child: Stack(
         children: [
           Hero(
-            tag: widget.articles.id,
+            tag: widget.articles.id!,
             child: CarouselSlider(
               options: CarouselOptions(
                   height: _size.width * 0.8,
@@ -429,13 +429,13 @@ class _DetailArticleViewState extends State<DetailArticleView>
     // 등록된 관심상품이 없음, 최초 등록
     if (isMyFavoriteContent && _serviceProvider.itemFavorites == null) {
       _serviceProvider.updateItemFavorites(ItemFavorites(
-          '', _serviceProvider.profile!.id, [widget.articles.id]));
+          '', _serviceProvider.profile!.id, [widget.articles.id!]));
       _serviceProvider.fetchItemFavorites();
     }
     // 관심상품에 추가
     else if (isMyFavoriteContent && _serviceProvider.itemFavorites != null) {
       // 관심상품 추가
-      _serviceProvider.itemFavorites!.itemId.add(widget.articles.id);
+      _serviceProvider.itemFavorites!.itemId.add(widget.articles.id!);
       _serviceProvider.updateItemFavorites(_serviceProvider.itemFavorites!);
     }
     // 관심상품에 제거

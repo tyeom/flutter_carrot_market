@@ -6,6 +6,7 @@ import 'package:app/services/articlesService.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 class ServiceProvider extends ChangeNotifier {
   // 계정 데이터 처리 서비스
@@ -83,9 +84,9 @@ class ServiceProvider extends ChangeNotifier {
   }
 
   // 데이터 요청중
-  dataFetching() {
+  dataFetching({bool isNotify = true}) {
     _isDataFetching = true;
-    notifyListeners();
+    if (isNotify) notifyListeners();
   }
 
   // 게시글 데이터 요청
@@ -120,15 +121,56 @@ class ServiceProvider extends ChangeNotifier {
   fetchArticlesByProfile(Profile profile) async {
     print('판매자 게시글 데이터 요청 - ${profile.phoneNum}');
 
-    // 딜레이 테스트
-    //await Future.delayed(const Duration(seconds: 7));
-
     var sellerArticles =
         await _articlesService.fetchArticlesByProfile(http.Client(), profile);
     _isDataFetching = false;
     _sellerArticles = sellerArticles;
 
     notifyListeners();
+  }
+
+  // 등록한 관심상품 데이터 조회
+  fetchFavoritesArticles() async {
+    if (_profile == null) {
+      print('계정 정보를 정상적으로 불러오지 못했습니다.');
+      return;
+    }
+
+    print('등록한 관심상품 데이터 요청 - ${_profile!.phoneNum}');
+
+    var favoritesArticles =
+        await _articlesService.fetchFavoritesArticles(http.Client(), _profile!);
+    _isDataFetching = false;
+    _articles = favoritesArticles;
+
+    notifyListeners();
+  }
+
+  // 판매중인 데이터 조회
+  fetchSalesHistoryArticles() async {
+    if (_profile == null) {
+      print('계정 정보를 정상적으로 불러오지 못했습니다.');
+      return;
+    }
+
+    print('판매중인 데이터 요청 - ${_profile!.phoneNum}');
+
+    var salesHistoryArticles =
+        await _articlesService.fetchArticlesByProfile(http.Client(), _profile!);
+    _isDataFetching = false;
+    _articles = salesHistoryArticles;
+
+    notifyListeners();
+  }
+
+  // 중고물품 데이터 등록 요청
+  Future<bool> addArticle(
+      List<MultipartFile> uplopadImages, Articles article) async {
+    print('중고물품 데이터 등록 요청 - ${_profile!.phoneNum}');
+
+    var result = await _articlesService.addArticle(
+        http.Client(), uplopadImages, article);
+    return result;
   }
 
   dispose() {

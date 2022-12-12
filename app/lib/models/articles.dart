@@ -1,7 +1,7 @@
 import 'package:app/models/profile.dart';
 
 class Articles {
-  String id;
+  String? id;
   List<String>? photoList;
   Profile profile;
   String title;
@@ -15,8 +15,7 @@ class Articles {
   String category;
 
   Articles(
-      {required this.id,
-      required this.photoList,
+      {required this.photoList,
       required this.profile,
       required this.title,
       required this.content,
@@ -41,7 +40,6 @@ class Articles {
         category = json['category'];
 
   Map<String, dynamic> toJson() => {
-        'id': id,
         'photoList': photoList,
         'profile': profile,
         'title': title,

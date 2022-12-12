@@ -6,14 +6,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ItemFavoritesView extends StatefulWidget {
-  const ItemFavoritesView({super.key});
+class SalesHistory extends StatefulWidget {
+  const SalesHistory({super.key});
 
   @override
-  State<ItemFavoritesView> createState() => _ItemFavoritesViewState();
+  State<SalesHistory> createState() => _SalesHistoryState();
 }
 
-class _ItemFavoritesViewState extends State<ItemFavoritesView> {
+class _SalesHistoryState extends State<SalesHistory> {
   late ServiceProvider _serviceProvider;
 
   @override
@@ -22,8 +22,8 @@ class _ItemFavoritesViewState extends State<ItemFavoritesView> {
 
     _serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
     _serviceProvider.dataFetching(isNotify: false);
-    // 등록한 관심상품 데이터 조회
-    _serviceProvider.fetchFavoritesArticles();
+    // 판매중인 데이터 조회
+    _serviceProvider.fetchSalesHistoryArticles();
   }
 
   @override
@@ -38,24 +38,6 @@ class _ItemFavoritesViewState extends State<ItemFavoritesView> {
     super.dispose();
   }
 
-  _itemFavorites(bool isMyFavoriteContent, Articles article) {
-    setState(() {
-      // 관심상품에 추가
-      if (isMyFavoriteContent && _serviceProvider.itemFavorites != null) {
-        // 관심상품 추가
-        _serviceProvider.itemFavorites!.itemId.add(article.id!);
-        _serviceProvider.updateItemFavorites(_serviceProvider.itemFavorites!);
-      }
-      // 관심상품에 제거
-      else if (isMyFavoriteContent == false &&
-          _serviceProvider.itemFavorites != null) {
-        // 관심상품 제거
-        _serviceProvider.itemFavorites!.itemId.remove(article.id);
-        _serviceProvider.updateItemFavorites(_serviceProvider.itemFavorites!);
-      }
-    });
-  }
-
   PreferredSizeWidget _appbarWidget() {
     return AppBar(
         // Leading 제거 (상단 뒤로가기 버튼)
@@ -63,7 +45,7 @@ class _ItemFavoritesViewState extends State<ItemFavoritesView> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: Text(
-          '관심목록',
+          '판매내역',
           style: TextStyle(fontSize: 20),
         ));
   }
@@ -108,42 +90,12 @@ class _ItemFavoritesViewState extends State<ItemFavoritesView> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      articles[index].title,
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold),
-                                      overflow: TextOverflow.clip,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        bool isMyFavorite = _serviceProvider
-                                            .itemFavorites!.itemId
-                                            .any((item) =>
-                                                item == articles[index].id);
-                                        _itemFavorites(
-                                            !isMyFavorite, articles[index]);
-                                      },
-                                      child: Container(
-                                        margin: EdgeInsets.only(right: 10),
-                                        child: SvgPicture.asset(
-                                            _serviceProvider
-                                                    .itemFavorites!.itemId
-                                                    .any((item) =>
-                                                        item ==
-                                                        articles[index].id)
-                                                ? "assets/svg/heart_on.svg"
-                                                : "assets/svg/heart_off.svg",
-                                            width: 20,
-                                            height: 20,
-                                            color: Color(0xfff08f4f)),
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  articles[index].title,
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.clip,
                                 ),
                                 SizedBox(
                                   height: 1,
@@ -203,7 +155,7 @@ class _ItemFavoritesViewState extends State<ItemFavoritesView> {
           },
           itemCount: articles.length);
     } else {
-      return Center(child: Text("등록된 관심상품이 없습니다."));
+      return Center(child: Text("판매중인 상품이 없습니다."));
     }
   }
 

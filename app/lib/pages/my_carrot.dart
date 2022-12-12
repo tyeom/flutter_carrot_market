@@ -1,6 +1,6 @@
-import 'package:app/models/item_favorites.dart';
 import 'package:app/models/profile.dart';
 import 'package:app/pages/item_favorites.dart';
+import 'package:app/pages/sales_history.dart';
 import 'package:app/provider/service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -216,9 +216,22 @@ class _MyCarrotState extends State<MyCarrot> {
                     'assets/svg/text-box.svg',
                     width: 30,
                   ),
-                  Text(
-                    '판매 내역',
-                    style: TextStyle(fontSize: 18),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => SalesHistory())));
+                      },
+                      child: Container(
+                        height: 25,
+                        child: Text(
+                          '판매 내역',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

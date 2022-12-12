@@ -24,6 +24,10 @@ class MyApp extends StatelessWidget {
         title: '당근마켓',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          textSelectionTheme: const TextSelectionThemeData(
+              cursorColor: Color(0xfff08f4f),
+              selectionColor: Color(0xfff08f4f),
+              selectionHandleColor: Colors.black),
           colorScheme: const ColorScheme(
             primary: Colors.white,
             onPrimary: Colors.black,

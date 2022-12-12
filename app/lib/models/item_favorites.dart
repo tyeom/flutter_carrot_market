@@ -10,7 +10,7 @@ class ItemFavorites {
       : id = json['id'],
         userId = json['userId'],
         updateTime = json['updateTime'],
-        itemId = json['itemId'].cast<String>();
+        itemId = (json['itemId'] == null) ? [] : json['itemId'].cast<String>();
 
   Map<String, dynamic> toJson() => {
         'userId': userId,
