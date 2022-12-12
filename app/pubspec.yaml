@@ -44,6 +44,7 @@ dependencies:
   image_picker: ^0.8.6
   dotted_border: ^2.0.0+3
   fluttertoast: ^8.1.2
+  cached_network_image: ^3.2.3
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'package:app/helpers/image_helper.dart';
 import 'package:app/models/articles.dart';
 import 'package:app/pages/add_article.dart';
 import 'package:app/pages/detail.dart';
@@ -24,7 +25,7 @@ class _HomeState extends State<Home> {
     _serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
 
     // 계정정보 요청
-    _serviceProvider.fetchProfile('01011112222');
+    _serviceProvider.fetchProfile('01077778888');
   }
 
   @override
@@ -103,13 +104,18 @@ class _HomeState extends State<Home> {
           physics: ClampingScrollPhysics(), // bounce 효과 제거
           itemBuilder: (BuildContext _context, int index) {
             return GestureDetector(
-              onTap: () {
+              onTap: () async {
                 print(articles[index].id);
-                Navigator.push(
+                final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: ((context) =>
                             DetailArticleView(articles: articles[index]))));
+
+                if (result == true) {
+                  _serviceProvider.dataFetching();
+                  _serviceProvider.fetchArticles(_serviceProvider.currentTown!);
+                }
               },
               child: Container(
                   color: Colors.transparent,
@@ -119,14 +125,13 @@ class _HomeState extends State<Home> {
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       child: Hero(
                         tag: articles[index].id!,
-                        child: Image.asset(
-                          (articles[index].photoList == null)
-                              ? 'assets/images/empry.jpg'
-                              : articles[index].photoList![0],
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.fill,
-                        ),
+                        child: ImageHelper.ImageWidget(
+                            imgPath: (articles[index].photoList == null)
+                                ? 'assets/images/empry.jpg'
+                                : articles[index].photoList![0],
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.fill),
                       ),
                     ),
                     Expanded(
@@ -220,15 +225,19 @@ class _HomeState extends State<Home> {
               child: CircularProgressIndicator(
                   color: Color.fromARGB(255, 252, 113, 49)));
         } else if (value.articles != null) {
-          return _bodyWidget(value.articles!);
+          return _bodyWidget(value.articles!.reversed.toList());
         } else {
           return Container();
         }
       })),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final reuslt = await Navigator.push(
               context, MaterialPageRoute(builder: ((context) => AddArticle())));
+          if (reuslt == true) {
+            _serviceProvider.dataFetching();
+            _serviceProvider.fetchArticles(_serviceProvider.currentTown!);
+          }
         },
         backgroundColor: Color(0xfff08f4f),
         child: const Icon(Icons.add),

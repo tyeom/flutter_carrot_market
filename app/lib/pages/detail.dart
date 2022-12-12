@@ -1,3 +1,4 @@
+import 'package:app/helpers/image_helper.dart';
 import 'package:app/models/articles.dart';
 import 'package:app/models/item_favorites.dart';
 import 'package:app/provider/service_provider.dart';
@@ -71,6 +72,46 @@ class _DetailArticleViewState extends State<DetailArticleView>
     });
   }
 
+  Widget _moreMenuWidget() {
+    if (widget.articles.profile.id == _serviceProvider.profile!.id) {
+      return PopupMenuButton<int>(
+        onSelected: (selectedValue) {
+          print(selectedValue);
+          switch (selectedValue) {
+            case 3:
+              _serviceProvider.removeArticle(widget.articles);
+              Navigator.pop<bool>(context, true);
+              break;
+          }
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem<int>(value: 0, child: Text('게시글 수정')),
+          PopupMenuItem<int>(value: 1, child: Text('끌어올리기')),
+          PopupMenuItem<int>(value: 2, child: Text('숨기기')),
+          PopupMenuItem<int>(value: 3, child: Text('삭제'))
+        ],
+        icon: Icon(
+          Icons.more_vert,
+          color: _colorTween.value,
+        ),
+      );
+    } else {
+      return PopupMenuButton<int>(
+        onSelected: (selectedValue) {
+          print(selectedValue);
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem<int>(value: 0, child: Text('신고하기')),
+          PopupMenuItem<int>(value: 1, child: Text('이 사용자의 글 보지 않기'))
+        ],
+        icon: Icon(
+          Icons.more_vert,
+          color: _colorTween.value,
+        ),
+      );
+    }
+  }
+
   PreferredSizeWidget _appbarWidget() {
     return AppBar(
       leading: IconButton(
@@ -78,7 +119,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
             Icons.arrow_back,
             color: _colorTween.value,
           ),
-          onPressed: (() => Navigator.pop(context))),
+          onPressed: (() => Navigator.pop<bool>(context, false))),
       backgroundColor: Colors.white.withAlpha(_locationAlpha.toInt()),
       elevation: 0,
       actions: [
@@ -86,13 +127,8 @@ class _DetailArticleViewState extends State<DetailArticleView>
           onPressed: () {},
           icon: Icon(Icons.share, color: _colorTween.value),
         ),
-        IconButton(
-          onPressed: () {},
-          icon: Icon(
-            Icons.more_vert,
-            color: _colorTween.value,
-          ),
-        ),
+        // 더 보기 메뉴 위젯
+        _moreMenuWidget(),
       ],
     );
   }
@@ -121,10 +157,8 @@ class _DetailArticleViewState extends State<DetailArticleView>
                         width: _size.width,
                         height: _size.width,
                         color: Colors.red,
-                        child: Image.asset(
-                          item,
-                          fit: BoxFit.cover,
-                        ),
+                        child: ImageHelper.ImageWidget(
+                            imgPath: item, fit: BoxFit.cover),
                       ))
                   .toList(),
             ),
@@ -375,11 +409,10 @@ class _DetailArticleViewState extends State<DetailArticleView>
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        sellerArticles[index].photoList![0],
-                        height: 130,
-                        fit: BoxFit.cover,
-                      ),
+                      child: ImageHelper.ImageWidget(
+                          imgPath: sellerArticles[index].photoList![0],
+                          height: 130,
+                          fit: BoxFit.cover),
                     ),
                     SizedBox(height: 10),
                     Text(
@@ -421,7 +454,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
       ),
 
       // 해당 판매자 게시글
-      _sellerArticlesWidget(sellerArticles),
+      _sellerArticlesWidget(sellerArticles?.reversed.toList()),
     ]);
   }
 

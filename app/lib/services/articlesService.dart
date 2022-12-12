@@ -113,12 +113,26 @@ class ArticlesService {
     var url = Uri.http(_baseURL, '/articlesImageUpload');
     http.MultipartRequest request = new http.MultipartRequest('POST', url);
     request.files.addAll(uplopadImages);
-    final response = await request.send();
+    final streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
     if (response.statusCode == 200) {
       print('상품 이미지 업로드 완료');
+      print(response.body);
+      print('--------------------------------------');
       print('상품 데이터 등록 시작');
 
       // 2. 상품 데이터 등록
+      final uploadImagesMap = jsonDecode(response.body);
+      if (uploadImagesMap.containsKey("images")) {
+        article.photoList!.clear();
+        uploadImagesMap["images"].forEach((item) {
+          article.photoList!.add(item);
+        });
+      } else {
+        print('업로드 이미지 이름 정보 json 오류');
+        return false;
+      }
+
       url = Uri.http(_baseURL, '/addArticle');
       final body = json.encode(article.toJson());
       final addArticleResponse = await client.post(url,
@@ -136,6 +150,19 @@ class ArticlesService {
       print('상품 이미지 업로드도중 오류가 발생하였습니다.');
       print(response.toString());
       throw Exception(response.toString());
+    }
+  }
+
+  // 중고거래 상품 제거
+  Future<bool> removeArticle(http.Client client, Articles article) async {
+    print('중고거래 상품 제거');
+    // http://arong.info:7004/removeArticle/{articleKey}
+    var url = Uri.http(_baseURL, '/removeArticle/${article.id}');
+    final response = await client.get(url);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
     }
   }
 }

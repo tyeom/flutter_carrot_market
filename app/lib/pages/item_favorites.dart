@@ -1,3 +1,4 @@
+import 'package:app/helpers/image_helper.dart';
 import 'package:app/models/articles.dart';
 import 'package:app/pages/detail.dart';
 import 'package:app/provider/service_provider.dart';
@@ -91,14 +92,13 @@ class _ItemFavoritesViewState extends State<ItemFavoritesView> {
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                       child: Hero(
                         tag: articles[index].id!,
-                        child: Image.asset(
-                          (articles[index].photoList == null)
-                              ? 'assets/images/empry.jpg'
-                              : articles[index].photoList![0],
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.fill,
-                        ),
+                        child: ImageHelper.ImageWidget(
+                            imgPath: (articles[index].photoList == null)
+                                ? 'assets/images/empry.jpg'
+                                : articles[index].photoList![0],
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.fill),
                       ),
                     ),
                     Expanded(

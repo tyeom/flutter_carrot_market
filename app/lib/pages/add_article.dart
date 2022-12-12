@@ -10,6 +10,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:http_parser/http_parser.dart';
 
 class AddArticle extends StatefulWidget {
   const AddArticle({super.key});
@@ -141,7 +142,8 @@ class _AddArticleState extends State<AddArticle> {
       var stream = _pickerImgList[i].openRead();
       var length = await imageFile.length();
       var multipartFile = http.MultipartFile("articlesImages", stream, length,
-          filename: _pickerImgList[i].name);
+          filename: _pickerImgList[i].name,
+          contentType: MediaType('image', 'jpg'));
       uploadImages.add(multipartFile);
     }
 
@@ -159,6 +161,8 @@ class _AddArticleState extends State<AddArticle> {
         category: _selectedCategory);
 
     try {
+      _serviceProvider.dataFetching();
+
       bool result = await _serviceProvider.addArticle(uploadImages, article);
       if (result) {
         Fluttertoast.showToast(
@@ -167,7 +171,9 @@ class _AddArticleState extends State<AddArticle> {
             backgroundColor: Colors.redAccent,
             fontSize: 20,
             textColor: Colors.white,
-            toastLength: Toast.LENGTH_LONG);
+            toastLength: Toast.LENGTH_SHORT);
+
+        Navigator.pop<bool>(context, result);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -249,101 +255,122 @@ class _AddArticleState extends State<AddArticle> {
   Widget _bodyWidget() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      _pickImg();
-                    },
-                    child: SvgPicture.asset(
-                      "assets/svg/camera.svg",
-                    ),
+      child: Stack(
+        children: [
+          Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          _pickImg();
+                        },
+                        child: SvgPicture.asset(
+                          "assets/svg/camera.svg",
+                        ),
+                      ),
+                      Flexible(child: _photoPreviewWidget())
+                      // Expanded(
+                      //   child: GridView.count(
+                      //     crossAxisCount: 3,
+                      //     mainAxisSpacing: 1,
+                      //     crossAxisSpacing: 20,
+                      //     children: List.generate(5, (index) {
+                      //       return Container(
+                      //         color: Colors.yellow,
+                      //         child: Text('aasd'),
+                      //       );
+                      //     }),
+                      //   ),
+                      // )
+                    ],
                   ),
-                  Flexible(child: _photoPreviewWidget())
-                  // Expanded(
-                  //   child: GridView.count(
-                  //     crossAxisCount: 3,
-                  //     mainAxisSpacing: 1,
-                  //     crossAxisSpacing: 20,
-                  //     children: List.generate(5, (index) {
-                  //       return Container(
-                  //         color: Colors.yellow,
-                  //         child: Text('aasd'),
-                  //       );
-                  //     }),
-                  //   ),
-                  // )
-                ],
-              ),
-            ),
-            TextField(
-              controller: _titleTextEditingController,
-              decoration: InputDecoration(
-                  hintText: '제목',
-                  contentPadding: EdgeInsets.symmetric(vertical: 10)),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            DropdownButton(
-                isExpanded: true,
-                items:
-                    ['디지털기기', '생활가전', '가구/인테리어', '유아동', '의류', '식품', '삽니다', '기타']
+                ),
+                TextField(
+                  controller: _titleTextEditingController,
+                  decoration: InputDecoration(
+                      hintText: '제목',
+                      contentPadding: EdgeInsets.symmetric(vertical: 10)),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                DropdownButton(
+                    isExpanded: true,
+                    items: [
+                      '디지털기기',
+                      '생활가전',
+                      '가구/인테리어',
+                      '유아동',
+                      '의류',
+                      '식품',
+                      '삽니다',
+                      '기타'
+                    ]
                         .map((item) => DropdownMenuItem(
                               child: Text(item),
                               value: item,
                             ))
                         .toList(),
-                value: _selectedCategory,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCategory = value.toString();
-                  });
-                }),
-            TextField(
-              controller: _priceTextEditingController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                  hintText: '￦ 가격',
-                  contentPadding: EdgeInsets.symmetric(vertical: 10)),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                  border: Border.all(
-                width: 1,
-                color: Colors.grey,
-              )),
-              constraints: BoxConstraints(maxHeight: 200),
-              child: Scrollbar(
-                child: TextField(
-                  controller: _contentTextEditingController,
-                  style: TextStyle(fontSize: 17),
-                  keyboardType: TextInputType.multiline,
-                  maxLength: null,
-                  maxLines: null,
+                    value: _selectedCategory,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCategory = value.toString();
+                      });
+                    }),
+                TextField(
+                  controller: _priceTextEditingController,
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                      border: InputBorder.none,
-                      filled: true,
-                      fillColor: Colors.transparent,
-                      hintMaxLines: 3,
-                      hintText:
-                          '해당동에 올릴 게시글 내용을 작성해주세요. (가품 및 판매 금지 물품은 게시가 제한될 수 있어요.)',
-                      hintStyle:
-                          TextStyle(fontSize: 17, overflow: TextOverflow.clip)),
+                      hintText: '￦ 가격',
+                      contentPadding: EdgeInsets.symmetric(vertical: 10)),
                 ),
-              ),
-            )
-          ]),
+                SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                    width: 1,
+                    color: Colors.grey,
+                  )),
+                  constraints: BoxConstraints(maxHeight: 200),
+                  child: Scrollbar(
+                    child: TextField(
+                      controller: _contentTextEditingController,
+                      style: TextStyle(fontSize: 17),
+                      keyboardType: TextInputType.multiline,
+                      maxLength: null,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          hintMaxLines: 3,
+                          hintText:
+                              '해당동에 올릴 게시글 내용을 작성해주세요. (가품 및 판매 금지 물품은 게시가 제한될 수 있어요.)',
+                          hintStyle: TextStyle(
+                              fontSize: 17, overflow: TextOverflow.clip)),
+                    ),
+                  ),
+                )
+              ]),
+          Consumer<ServiceProvider>(builder: ((context, value, child) {
+            if (value.isDataFetching) {
+              return const Center(
+                  child: CircularProgressIndicator(
+                      color: Color.fromARGB(255, 252, 113, 49)));
+            } else {
+              return Container(height: 0, width: 0);
+            }
+          }))
+        ],
+      ),
     );
   }
 

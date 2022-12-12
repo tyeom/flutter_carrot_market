@@ -170,6 +170,18 @@ class ServiceProvider extends ChangeNotifier {
 
     var result = await _articlesService.addArticle(
         http.Client(), uplopadImages, article);
+    _isDataFetching = false;
+    notifyListeners();
+    return result;
+  }
+
+  // 중고거래 상품 제거
+  Future<bool> removeArticle(Articles article) async {
+    print('중고물품 데이터 제거 요청 - ${article.id}');
+
+    var result = await _articlesService.removeArticle(http.Client(), article);
+    _isDataFetching = false;
+    notifyListeners();
     return result;
   }
 
