@@ -28,8 +28,8 @@ const multerFilter = (req, file, cb) => {
 };
 const upload = multer({
     storage: multerStorage,
-    // 업로드 사이즈 제한 : 10MB
-    limits: { fileSize: 10 * 1024 * 1024 },
+    // 업로드 사이즈 제한 : 50MB
+    limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: multerFilter
 });
 // Limit 5 image uploads
