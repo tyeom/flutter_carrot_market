@@ -71,6 +71,31 @@ module.exports = function(app) {
         })
     });
 
+    // 업로드 이미지 보기
+    app.get('/articlesImage/:imageName',function(req,res) {
+        const imageName = req.params.imageName;
+        const fs = require('fs');
+
+        if (fs.existsSync(`/home/node/app/imageUpload/${imageName}`) == false) {
+            res.status(401)
+            .json({error: 'not found image'});
+            return;
+        }
+
+        fs.readFile(`/home/node/app/imageUpload/${imageName}`, function(err, data){
+            console.log('image loading');
+            if(err) {
+                res.status(500)
+                .json({error: err.toString()});
+            }
+            else {
+                res.writeHead(200);
+                res.write(data);
+                res.end();
+            }
+        });
+    });
+
     // 사용자 추가
     app.post('/addUser',function(req,res) {
         let reqJson = req.body;
@@ -93,6 +118,23 @@ module.exports = function(app) {
         });
         res.statusCode = 200;
         res.send("ok");
+    });
+
+    // 판매 정보 삭제
+    app.get('/removeArticle/:articleId',function(req,res) {
+        const articleId = req.params.articleId;
+        let articlesRef = firebaseAdmin.database().ref(`articles/${articleId}`);
+        articlesRef.remove(function(err) {    
+            if(err) {
+                console.log(err);
+                res.status(500)
+                .json({error: error.toString()});
+            }
+            else {
+                res.statusCode = 200;
+                res.send("ok");
+            }
+        });
     });
 
     // 사용자 정보 조회 By PhoneNum
