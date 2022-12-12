@@ -12,7 +12,7 @@ const firebaseAdmin = admin.initializeApp({
 
 const multerStorage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './imageUpload');
+        cb(null, '/home/node/app/imageUpload');
     },
     filename: function(req, file, cb) {
         cb(null, `articles_${Date.now()}.${file.mimetype.split("/")[1]}`);
@@ -28,8 +28,8 @@ const multerFilter = (req, file, cb) => {
 };
 const upload = multer({
     storage: multerStorage,
-    // 업로드 사이즈 제한 : 5MB
-    limits: { fileSize: 5 * 1024 * 1024 },
+    // 업로드 사이즈 제한 : 10MB
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: multerFilter
 });
 // Limit 5 image uploads
