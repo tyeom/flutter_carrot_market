@@ -107,6 +107,7 @@ class ArticlesService {
   // 중고거래 상품 등록
   Future<bool> addArticle(http.Client client, List<MultipartFile> uplopadImages,
       Articles article) async {
+    print('상품 이미지 업로드 시작');
     // 1. 상품 이미지 업로드
     // http://arong.info:7004/articlesImageUpload
     var url = Uri.http(_baseURL, '/articlesImageUpload');
@@ -114,6 +115,9 @@ class ArticlesService {
     request.files.addAll(uplopadImages);
     final response = await request.send();
     if (response.statusCode == 200) {
+      print('상품 이미지 업로드 완료');
+      print('상품 데이터 등록 시작');
+
       // 2. 상품 데이터 등록
       url = Uri.http(_baseURL, '/addArticle');
       final body = json.encode(article.toJson());
@@ -121,6 +125,8 @@ class ArticlesService {
           headers: {"Content-Type": "application/json"}, body: body);
 
       if (addArticleResponse.statusCode == 200) {
+        print('상품 데이터 등록 완료');
+
         return true;
       } else {
         print('상품 이미지 업로드 성공 -> 상품 데이터 등록 오류');

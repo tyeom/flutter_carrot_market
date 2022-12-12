@@ -140,7 +140,7 @@ class _AddArticleState extends State<AddArticle> {
       File imageFile = File(_pickerImgList[i].path);
       var stream = _pickerImgList[i].openRead();
       var length = await imageFile.length();
-      var multipartFile = http.MultipartFile("pictures", stream, length,
+      var multipartFile = http.MultipartFile("articlesImages", stream, length,
           filename: _pickerImgList[i].name);
       uploadImages.add(multipartFile);
     }
