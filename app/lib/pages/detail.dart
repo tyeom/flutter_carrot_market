@@ -156,7 +156,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
                   .map((item) => Container(
                         width: _size.width,
                         height: _size.width,
-                        color: Colors.red,
+                        color: Colors.grey,
                         child: ImageHelper.ImageWidget(
                             imgPath: item, fit: BoxFit.cover),
                       ))
