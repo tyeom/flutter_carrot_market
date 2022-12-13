@@ -108,36 +108,36 @@ Environment
 -
 
 #### `중고물품 리스트 화면`
-| Mobile App | Windown App |
+| Mobile App | Windows App |
 | --- | --- |
 | <img src="https://user-images.githubusercontent.com/13028129/206992683-edb9c45c-aec0-474d-90b9-f9bb15a3005c.png" width="300" height="700"/> | <img src="https://user-images.githubusercontent.com/13028129/207190777-6603c0ff-aacd-498c-a443-5e93b719ea8b.png" width="300" height="700"/>
 
 
 #### `물품 상세보기 화면`
-| Mobile App | Windown App |
+| Mobile App | Windows App |
 | --- | --- |
 | <img src="https://user-images.githubusercontent.com/13028129/207193186-66d25b28-33b5-41d4-ad7d-ca41442d67bd.png" width="300" height="700"/> | <img src="https://user-images.githubusercontent.com/13028129/207193543-708b7c7d-05ba-47ff-a22a-430f23f0a441.png" width="300" height="700"/>
 
 
 #### `마이 당근 화면`
-| Mobile App | Windown App |
+| Mobile App | Windows App |
 | --- | --- |
 | <img src="https://user-images.githubusercontent.com/13028129/207194917-e7c44ede-50f9-4145-bc9f-4c5b94cdae1a.png" width="300" height="700"/> | <img src="https://user-images.githubusercontent.com/13028129/207195142-61b325d9-5735-4969-968c-f1bf726289df.png" width="300" height="700"/>
 
 
 #### `관심상품 목록 화면`
-| Mobile App | Windown App |
+| Mobile App | Windows App |
 | --- | --- |
 | <img src="https://user-images.githubusercontent.com/13028129/207196164-38371149-27b3-4052-acde-113d06749e8a.png" width="300" height="700"/> | <img src="https://user-images.githubusercontent.com/13028129/207196273-cc0b5647-f392-490d-85bc-70b9c9fbbcef.png" width="300" height="700"/>
 
 
 #### `중고물품 등록 화면`
-| Mobile App | Windown App |
+| Mobile App | Windows App |
 | --- | --- |
 | <img src="https://user-images.githubusercontent.com/13028129/207196497-17c40548-7f92-4031-af3f-e8fc233c4e74.png" width="300" height="700"/> | 해당 없음<br/>모바일 디바이스 카메라 앨범 기능 의존
 
 
 #### `판매내역 목록 화면`
-| Mobile App | Windown App |
+| Mobile App | Windows App |
 | --- | --- |
 | <img src="https://user-images.githubusercontent.com/13028129/207197411-178157ad-2f62-45e4-a476-7f08d3f07e33.png" width="300" height="700"/> | <img src="https://user-images.githubusercontent.com/13028129/207197523-7b38321a-e6b1-4b31-b434-f7984ba4f990.png" width="300" height="700"/>
