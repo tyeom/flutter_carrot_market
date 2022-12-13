@@ -93,6 +93,7 @@ class _AddArticleState extends State<AddArticle> {
     );
   }
 
+  // 중고물품 데이터 등록
   _addArticle() async {
     if (_pickerImgList.length <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -135,8 +136,10 @@ class _AddArticleState extends State<AddArticle> {
       return;
     }
 
+    // 업로드할 중고물품 사진 리스트
     final List<MultipartFile> uploadImages = [];
 
+    // 선택된 카메라 앨범 사진정보 기준으로 MultipartFile 타입 생성
     for (int i = 0; i < _pickerImgList.length; i++) {
       File imageFile = File(_pickerImgList[i].path);
       var stream = _pickerImgList[i].openRead();
@@ -147,6 +150,7 @@ class _AddArticleState extends State<AddArticle> {
       uploadImages.add(multipartFile);
     }
 
+    // 등록될 중고물품 데이터 정보
     Articles article = Articles(
         photoList: [],
         profile: _serviceProvider.profile!,
@@ -161,8 +165,10 @@ class _AddArticleState extends State<AddArticle> {
         category: _selectedCategory);
 
     try {
+      // 데이터 등록중 표시
       _serviceProvider.dataFetching();
 
+      // 새로운 중고물품 데이터 등록
       bool result = await _serviceProvider.addArticle(uploadImages, article);
       if (result) {
         Fluttertoast.showToast(
@@ -173,6 +179,7 @@ class _AddArticleState extends State<AddArticle> {
             textColor: Colors.white,
             toastLength: Toast.LENGTH_SHORT);
 
+        // 데이터 등록 후 AddArticle 닫기
         Navigator.pop<bool>(context, result);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -195,6 +202,7 @@ class _AddArticleState extends State<AddArticle> {
     }
   }
 
+  // 카레라 앨범에서 사진 선택
   Future<void> _pickImg() async {
     final List<XFile>? images = await _imagePicker.pickMultiImage();
     if (images == null) return;
@@ -204,17 +212,19 @@ class _AddArticleState extends State<AddArticle> {
     });
   }
 
+  // 선택된 사진 미리보기
   Widget _photoPreviewWidget() {
     if (_pickerImgList.length <= 0) return Container();
 
     return GridView.count(
         shrinkWrap: true,
         padding: EdgeInsets.all(2),
-        crossAxisCount: 5,
+        crossAxisCount: 5, // 최대 5개
         mainAxisSpacing: 1,
         crossAxisSpacing: 5,
         children: List.generate(_pickerImgList.length, (index) {
           //return Container();
+          // 대시라인 보더 위젯으로 감싸 선택한 사진을 표시한다.
           return DottedBorder(
               child: Container(
                   child: Container(
@@ -265,6 +275,7 @@ class _AddArticleState extends State<AddArticle> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      // 카메라 앨범에서 사진 선택
                       ElevatedButton(
                         onPressed: () {
                           _pickImg();
@@ -290,6 +301,7 @@ class _AddArticleState extends State<AddArticle> {
                     ],
                   ),
                 ),
+                // 제목 입력 필드
                 TextField(
                   controller: _titleTextEditingController,
                   decoration: InputDecoration(
@@ -299,6 +311,7 @@ class _AddArticleState extends State<AddArticle> {
                 SizedBox(
                   height: 15,
                 ),
+                // 카테고리 선택 드롭다운
                 DropdownButton(
                     isExpanded: true,
                     items: [
@@ -322,6 +335,7 @@ class _AddArticleState extends State<AddArticle> {
                         _selectedCategory = value.toString();
                       });
                     }),
+                //가격 입력 필드
                 TextField(
                   controller: _priceTextEditingController,
                   keyboardType: TextInputType.number,
@@ -332,6 +346,7 @@ class _AddArticleState extends State<AddArticle> {
                 SizedBox(
                   height: 15,
                 ),
+                // 내용 입력 필드
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
@@ -361,6 +376,7 @@ class _AddArticleState extends State<AddArticle> {
                 )
               ]),
           Consumer<ServiceProvider>(builder: ((context, value, child) {
+            // 중고물품 데이터 등록중인 경우 로딩 위젯 표시
             if (value.isDataFetching) {
               return const Center(
                   child: CircularProgressIndicator(

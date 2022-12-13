@@ -133,6 +133,7 @@ class ArticlesService {
         return false;
       }
 
+      // http://arong.info:7004/addArticle
       url = Uri.http(_baseURL, '/addArticle');
       final body = json.encode(article.toJson());
       final addArticleResponse = await client.post(url,

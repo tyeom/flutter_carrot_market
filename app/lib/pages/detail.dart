@@ -25,8 +25,10 @@ class _DetailArticleViewState extends State<DetailArticleView>
   late Size _size;
   late int _current;
   ScrollController _scrollController = ScrollController();
+  // AppBar backgroundColor Alpha 값
   double _locationAlpha = 0;
   late AnimationController _animationController;
+  // AppBar에서 리딩버튼(뒤로가기), [공유], [더 보기] 액션 버튼의 Color 애니매이션 (to: white, from: black)
   late Animation _colorTween;
   bool _isMyFavoriteContent = false;
 
@@ -61,25 +63,31 @@ class _DetailArticleViewState extends State<DetailArticleView>
     _current = 0;
     _scrollController.addListener(() {
       setState(() {
+        // SliverList 컨텐츠의 스크롤이 변경될때 AppBar의 backgroundColor Alpha값을 변경해준다.
         if (_scrollController.offset > 255) {
           _locationAlpha = 255;
         } else {
           _locationAlpha = _scrollController.offset;
         }
 
+        // SliverList 컨텐츠의 스크롤이 변경될때 AppBar에서 리딩버튼(뒤로가기), [공유], [더 보기] 액션 버튼의 Color 애니매이션 값 변경
         _animationController.value = _locationAlpha / 255;
       });
     });
   }
 
+  // 더 보기 메뉴
   Widget _moreMenuWidget() {
+    // 해당 중고물품 글이 로그인한 사용자의 데이터인 경우
     if (widget.articles.profile.id == _serviceProvider.profile!.id) {
       return PopupMenuButton<int>(
         onSelected: (selectedValue) {
           print(selectedValue);
           switch (selectedValue) {
             case 3:
+              // 해당 중고물품 데이터 삭제
               _serviceProvider.removeArticle(widget.articles);
+              // 데이터 삭제 후 DetailArticleView 닫기
               Navigator.pop<bool>(context, true);
               break;
           }
@@ -95,7 +103,9 @@ class _DetailArticleViewState extends State<DetailArticleView>
           color: _colorTween.value,
         ),
       );
-    } else {
+    }
+    // 해당 중고물품 글이 다른 사용자의 데이터인 경우
+    else {
       return PopupMenuButton<int>(
         onSelected: (selectedValue) {
           print(selectedValue);
@@ -133,6 +143,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     );
   }
 
+  // 상품 이미지 보기
   Widget _makeSliderImage() {
     return Container(
       height: _size.width * 0.8,
@@ -149,6 +160,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
                   enlargeCenterPage: false,
                   onPageChanged: (index, reason) {
                     setState(() {
+                      // 이미지가 여러개인 경우 _current 값을 통해 Position처리를 한다.
                       _current = index;
                     });
                   }),
@@ -190,6 +202,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     );
   }
 
+  // 판매자 프로필 정보
   Widget _profileInfo() {
     return Padding(
       padding: const EdgeInsets.all(15.0),
@@ -224,6 +237,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     );
   }
 
+  // 경계선
   Widget _line() {
     return Container(
       height: 1,
@@ -232,6 +246,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     );
   }
 
+  // 중고물품 등록 시간 계산
   String _calcUploadTime(int uploadTime) {
     DateTime uploadDateTime =
         DateTime.fromMillisecondsSinceEpoch(uploadTime * 1000);
@@ -247,6 +262,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     }
   }
 
+  // 중고물품 상세내용
   Widget _contentDetail(Articles detailArticle) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15),
@@ -301,6 +317,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     );
   }
 
+  // 게시글 신고하기 및 해당 판매자의 다른 판매 상품 보기 Title
   Widget _otherCellContents() {
     return Padding(
       padding: EdgeInsets.all(15),
@@ -351,6 +368,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     );
   }
 
+  // 해당 판매자 게시글
   Widget _sellerArticlesWidget(List<Articles>? sellerArticles) {
     // 데이터 로딩중이라면 임시 데이터로 표시한다.
     if (sellerArticles == null) {
@@ -458,6 +476,7 @@ class _DetailArticleViewState extends State<DetailArticleView>
     ]);
   }
 
+  // 관심상품 추가 및 제거 처리
   _itemFavorites(bool isMyFavoriteContent) {
     // 등록된 관심상품이 없음, 최초 등록
     if (isMyFavoriteContent && _serviceProvider.itemFavorites == null) {
@@ -571,10 +590,12 @@ class _DetailArticleViewState extends State<DetailArticleView>
       appBar: _appbarWidget(),
       body: Consumer<ServiceProvider>(builder: (context, value, child) {
         if (value.detailArticle == null) {
+          // 상세 데이터 요청중
           return const Center(
               child: CircularProgressIndicator(
                   color: Color.fromARGB(255, 252, 113, 49)));
         } else {
+          // 상세 데이터 요청 완료
           return _bodyWidget(value.detailArticle!, value.sellerArticles);
         }
       }),

@@ -73,8 +73,11 @@ class _HomeState extends State<Home> {
                   SvgPicture.asset('assets/svg/chevron-down.svg')
                 ]),
                 onSelected: (String selectedValue) {
+                  // 드롭다운 메뉴에서 동네 선택시
+                  // 데이터 로딩 표시
                   value.dataFetching();
                   value.currentTown = selectedValue;
+                  // 해당 동네 중고물품 데이터 요청
                   value.fetchArticles(selectedValue);
                 });
           },
@@ -112,6 +115,7 @@ class _HomeState extends State<Home> {
                         builder: ((context) =>
                             DetailArticleView(articles: articles[index]))));
 
+                // 중고물품 상세화면에서 해당 데이터 수정 또는 삭제시 데이터 다시 요청 (갱신)
                 if (result == true) {
                   _serviceProvider.dataFetching();
                   _serviceProvider.fetchArticles(_serviceProvider.currentTown!);
@@ -217,16 +221,20 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: _appbarWidget(),
       body: Consumer<ServiceProvider>(builder: ((context, value, child) {
+        // 앱 로드 후 회원정보 로드 전 상태
         if (value.currentTown == null)
           return Center(child: Text("회원 동네정보가 존재하지 않습니다."));
 
         if (value.isDataFetching) {
+          // 데이터 요청중
           return const Center(
               child: CircularProgressIndicator(
                   color: Color.fromARGB(255, 252, 113, 49)));
         } else if (value.articles != null) {
+          // 데이터 요청 완료
           return _bodyWidget(value.articles!.reversed.toList());
         } else {
+          // 사실상 해당 경우는 없음
           return Container();
         }
       })),
@@ -234,6 +242,7 @@ class _HomeState extends State<Home> {
         onPressed: () async {
           final reuslt = await Navigator.push(
               context, MaterialPageRoute(builder: ((context) => AddArticle())));
+          // 새로운 중고물품 등록 후 데이터 갱신
           if (reuslt == true) {
             _serviceProvider.dataFetching();
             _serviceProvider.fetchArticles(_serviceProvider.currentTown!);
