@@ -16,13 +16,13 @@ Flutter 당근마켓 모바일 버전 클론 프로젝트 입니다. <br/>
 > Flutter 소스는 아래 코드를 참고 하였음을 알려드립니다. <br/>
 > https://github.com/sudar-life/flutter_carrot_market
 
-#### Web API 서버
+#### Web API Server
 - Node.js [express]
 
 #### DataBase
 - Firebase Realtime Database
 
-#### DataBase
+#### Flutter
 - Flutter 3.3.9
 - Engine : revision 8f2221fbef
 - Tools : Dart 2.18.5 / DevTools 2.15.0
