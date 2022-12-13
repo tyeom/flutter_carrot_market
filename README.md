@@ -18,6 +18,7 @@ Flutter 당근마켓 모바일 버전 클론 프로젝트 입니다. <br/>
 
 #### Web API Server
 - Node.js [express]
+- ＊ server url : http://arong.info:7004
 
 #### DataBase
 - Firebase Realtime Database
