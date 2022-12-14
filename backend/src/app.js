@@ -1,5 +1,6 @@
 const moment = require('moment');
 const multer = require("multer");
+const sharp = require("sharp");
 const bodyParser = require('body-parser');
 
 const admin = require('firebase-admin');
@@ -10,14 +11,20 @@ const firebaseAdmin = admin.initializeApp({
   databaseURL: "https://carrotmarketclone-c6231-default-rtdb.firebaseio.com"
 });
 
+const imageUploadPath = '/home/node/app/imageUpload';
+//const imageUploadPath = './imageUpload';
+
+// 업로드 이미지 origin 파일로 바로 저장
 const multerStorage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, '/home/node/app/imageUpload');
+        cb(null, imageUploadPath);
     },
     filename: function(req, file, cb) {
         cb(null, `articles_${Date.now()}.${file.mimetype.split("/")[1]}`);
     }
 });
+
+// 이미지 업로드 필터
 const multerFilter = (req, file, cb) => {
     if (file.mimetype.startsWith("image")) {
       cb(null, true);
@@ -26,14 +33,31 @@ const multerFilter = (req, file, cb) => {
       cb("Please upload only articlesImages.", false);
     }
 };
+
+// 이미지 업로드 필터 적용 By 파일 스토리지
 const upload = multer({
     storage: multerStorage,
     // 업로드 사이즈 제한 : 50MB
     //limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: multerFilter
 });
+
 // Limit 5 image uploads
 const uploadFiles = upload.array("articlesImages", 5);
+
+// 업로드 이미지 메모리로 저장
+const multerStorageByMemory = multer.memoryStorage();
+
+// 이미지 업로드 필터 적용 By 메모리 스토리지
+const uploadByMem = multer({
+    storage: multerStorageByMemory,
+    // 업로드 사이즈 제한 : 50MB
+    //limits: { fileSize: 50 * 1024 * 1024 },
+    fileFilter: multerFilter
+});
+
+// Limit 5 image uploads
+const uploadFilesByMem = uploadByMem.array("articlesImages", 5);
 
 module.exports = function(app) {
     app.use(bodyParser.json());
@@ -68,21 +92,82 @@ module.exports = function(app) {
                 res.status(200)
                 .json({images: req.files.map((item) => item.filename)});
             }
-        })
+        });
     });
+
+    // 이미지 업로드, 이미지 리사이징 처리
+    app.post('/articlesImageUploadWithResizing', function(req, res, next){
+        uploadFilesByMem(req, res, err => {
+            if(err instanceof multer.MulterError) {
+                if(err.code == "LIMIT_UNEXPECTED_FILE") {
+                    res.status(401)
+                    .json({error: 'Limit unexpected file'});
+                }
+                else {
+                    res.status(401)
+                    .json({error: err.toString()});
+                }
+            }
+            else if (err) {
+                res.status(500)
+                .json({error: err.toString()});
+            }
+            else {
+                console.log(req.files);
+                console.log('이미지 업로드 완료 - Memory');
+
+                // 이미지 리사이징 처리
+                next();
+            }
+        });
+    });
+
+    const resizeImages = async (req, res, next) => {
+        if (!req.files) return next();
+        
+        req.body.articlesImages = [];
+        await Promise.all(
+            req.files.map(async file => {
+                const filename = file.originalname.replace(/\..+$/, "");
+                const newFilename = `articles_${filename}_${Date.now()}.jpeg`;
+                
+                await sharp(file.buffer)
+                    .resize(850, 650)
+                    .toFormat("jpeg")
+                    .jpeg({ quality: 90 })
+                    .toFile(`${imageUploadPath}/${newFilename}`);
+                
+                req.body.articlesImages.push(newFilename);
+            })
+        );
+        
+        console.log('이미지 리사이징 완료');
+        next();
+    };
+
+    const getResult = async (req, res) => {
+        if (req.body.articlesImages.length <= 0) {
+            return res.send(`You must select at least 1 image.`);
+        }
+
+        res.status(200)
+        .json({images: req.body.articlesImages.map((item) => item)});
+    };
+
+    app.use('/articlesImageUploadWithResizing', resizeImages, getResult);
 
     // 업로드 이미지 보기
     app.get('/articlesImage/:imageName',function(req,res) {
         const imageName = req.params.imageName;
         const fs = require('fs');
 
-        if (fs.existsSync(`/home/node/app/imageUpload/${imageName}`) == false) {
+        if (fs.existsSync(`${imageUploadPath}/${imageName}`) == false) {
             res.status(401)
             .json({error: 'not found image'});
             return;
         }
 
-        fs.readFile(`/home/node/app/imageUpload/${imageName}`, function(err, data){
+        fs.readFile(`${imageUploadPath}/${imageName}`, function(err, data){
             console.log('image loading');
             if(err) {
                 res.status(500)

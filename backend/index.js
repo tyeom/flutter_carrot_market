@@ -5,6 +5,7 @@
  *            npm install decode-html
  *            npm install firebase-admin
  *            npm install multer
+ *            npm install sharp
  *
  */
 
