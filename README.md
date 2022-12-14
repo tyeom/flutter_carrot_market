@@ -64,6 +64,7 @@ Flutter 당근마켓 모바일 버전 클론 프로젝트 입니다. <br/>
 | [**decode-html**](https://www.npmjs.com/package/decode-html) | 2.0.0 |
 | [**firebase-admin**](https://www.npmjs.com/package/firebase-admin) | 11.3.0 |
 | [**multer**](https://www.npmjs.com/package/multer) | 1.4.5 |
+| [**sharp**](https://www.npmjs.com/package/sharp) | 0.31.2 |
 
 
 ***
