@@ -110,7 +110,7 @@ class ArticlesService {
     print('상품 이미지 업로드 시작');
     // 1. 상품 이미지 업로드
     // http://arong.info:7004/articlesImageUpload
-    var url = Uri.http(_baseURL, '/articlesImageUpload');
+    var url = Uri.http(_baseURL, '/articlesImageUploadWithResizing');
     http.MultipartRequest request = new http.MultipartRequest('POST', url);
     request.files.addAll(uplopadImages);
     final streamedResponse = await request.send();
